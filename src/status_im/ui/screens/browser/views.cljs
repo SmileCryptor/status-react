@@ -58,6 +58,7 @@
   (reagent/as-element
    [react/view styles/web-view-error
     [react/image {:style  {:width 140 :height 140 :margin-bottom 16}
+                  ;;TODO replace by loacal image
                   :source {:uri (contenthash/url
                                  "e3010170122001bbe2f5bfba0305a3bdc2047fddc47ee595a591bdee61de6040ffc2456624e1")}}]
     [react/i18n-text {:style styles/web-view-error-text :key :web-view-error}]

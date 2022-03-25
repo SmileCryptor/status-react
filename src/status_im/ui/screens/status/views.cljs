@@ -192,6 +192,7 @@
           [react/image {:style  {:width      140
                                  :height     140
                                  :align-self :center}
+                        ;;TODO replace by local image
                         :source {:uri (contenthash/url image-hash)}}]
           [react/view (styles/descr-container)
            [react/text {:style {:color       colors/gray

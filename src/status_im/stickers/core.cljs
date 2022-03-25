@@ -12,7 +12,8 @@
             [status-im.signing.core :as signing]
             [status-im.utils.contenthash :as contenthash]
             [status-im.utils.fx :as fx]
-            [status-im.utils.utils :as utils]))
+            [status-im.utils.utils :as utils]
+            [status-im.utils.money :as money]))
 
 (defn pack-data-callback
   [id]
@@ -57,36 +58,37 @@
 
 (re-frame/reg-fx
  :stickers/owned-packs-fx
- (fn [[contract address]]
-   (json-rpc/eth-call
-    {:contract contract
-     ;; Returns vector of owned tokens ids in the contract by address
-     :method "balanceOf(address)"
-     :params [address]
-     :outputs ["uint256"]
-     :number-of-retries 3
-     :on-success
-     (fn [[count]]
-       (dotimes [id count]
-         (json-rpc/eth-call
-          {:contract contract
-           ;; Returns pack id in the contract by token id
-           :method "tokenOfOwnerByIndex(address,uint256)"
-           :params [address id]
-           :outputs ["uint256"]
-           :number-of-retries 3
-           :on-success
-           (fn [[token-id]]
-             (json-rpc/eth-call
-              {:contract contract
-               ;; Returns pack id in the contract by token id
-               :method "tokenPackId(uint256)"
-               :params [token-id]
-               :outputs ["uint256"]
-               :number-of-retries 3
-               :on-success
-               (fn [[pack-id]]
-                 (re-frame/dispatch [:stickers/pack-owned pack-id]))}))})))})))
+ (fn [chain-id]
+
+   #_(json-rpc/eth-call
+      {:contract contract
+       ;; Returns vector of owned tokens ids in the contract by address
+       :method "balanceOf(address)"
+       :params [address]
+       :outputs ["uint256"]
+       :number-of-retries 3
+       :on-success
+       (fn [[count]]
+         (dotimes [id count]
+           (json-rpc/eth-call
+            {:contract contract
+             ;; Returns pack id in the contract by token id
+             :method "tokenOfOwnerByIndex(address,uint256)"
+             :params [address id]
+             :outputs ["uint256"]
+             :number-of-retries 3
+             :on-success
+             (fn [[token-id]]
+               (json-rpc/eth-call
+                {:contract contract
+                 ;; Returns pack id in the contract by token id
+                 :method "tokenPackId(uint256)"
+                 :params [token-id]
+                 :outputs ["uint256"]
+                 :number-of-retries 3
+                 :on-success
+                 (fn [[pack-id]]
+                   (re-frame/dispatch [:stickers/pack-owned pack-id]))}))})))})))
 
 (fx/defn init-stickers-packs
   [{:keys [db] :as cofx}]
@@ -150,15 +152,27 @@
               (fn [o]
                 (re-frame/dispatch [:stickers/load-sticker-pack-success o id price]))}})
 
+(fx/defn owned-sticker-packs-success
+  {:events [:stickers/owned-sticker-packs-success]}
+  [{:keys [db]} packs]
+  (let [packs (reduce (fn [acc pack] (assoc acc (js/parseInt (name (:id pack))) (update pack :price money/bignumber))) {} packs)]
+    {:db (update db :stickers/packs merge packs)}))
+
 (fx/defn load-packs
   {:events [:stickers/load-packs]}
   [{:keys [db]}]
   (let [contract      (contracts/get-address db :status/stickers)
         pack-contract (contracts/get-address db :status/sticker-pack)
         address       (ethereum/default-address db)]
-    (when contract
-      {:stickers/owned-packs-fx [pack-contract address]
-       :stickers/load-packs-fx [contract]})))
+    {::json-rpc/call [{:method "stickers_market"
+                       :params [(ethereum/chain-id db)]
+                       :on-success #(re-frame/dispatch [:stickers/owned-sticker-packs-success %])}
+                      #_{:method "stickers_installed"
+                         :params [(ethereum/chain-id db)]
+                         :on-success #(re-frame/dispatch [:stickers/owned-sticker-packs-success %])}]}
+    #_(when contract
+        {:stickers/owned-packs-fx (ethereum/chain-id db)
+         :stickers/load-packs-fx [contract]})))
 
 (fx/defn approve-pack
   {:events [:stickers/buy-pack]}

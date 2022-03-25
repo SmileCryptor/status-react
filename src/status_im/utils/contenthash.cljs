@@ -45,4 +45,5 @@
       :ipfs (ipfs-url hash)
       "")))
 
+;;TODO remove
 (def url (memoize url-fn))

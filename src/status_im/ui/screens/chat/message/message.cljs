@@ -568,7 +568,7 @@
                                                                             (re-frame/dispatch [:chat.ui/show-profile from]))
                                                                :label    (i18n/label :t/view-details)}])))})
       [react/fast-image {:style  {:margin 10 :width 140 :height 140}
-                         ;;TODO (perf) move to event
+                         ;;TODO add url in status-go
                          :source {:uri (contenthash/url (-> content :sticker :hash))}}]]
      reaction-picker]))
 
