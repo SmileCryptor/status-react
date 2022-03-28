@@ -152,10 +152,10 @@
               (fn [o]
                 (re-frame/dispatch [:stickers/load-sticker-pack-success o id price]))}})
 
-(fx/defn owned-sticker-packs-success
-  {:events [:stickers/owned-sticker-packs-success]}
+(fx/defn stickers-market-success
+  {:events [:stickers/stickers-market-success]}
   [{:keys [db]} packs]
-  (let [packs (reduce (fn [acc pack] (assoc acc (js/parseInt (name (:id pack))) (update pack :price money/bignumber))) {} packs)]
+  (let [packs (reduce (fn [acc pack] (assoc acc (js/parseInt (name (:id pack))) pack)) {} packs)]
     {:db (update db :stickers/packs merge packs)}))
 
 (fx/defn load-packs
@@ -166,7 +166,7 @@
         address       (ethereum/default-address db)]
     {::json-rpc/call [{:method "stickers_market"
                        :params [(ethereum/chain-id db)]
-                       :on-success #(re-frame/dispatch [:stickers/owned-sticker-packs-success %])}
+                       :on-success #(re-frame/dispatch [:stickers/stickers-market-success %])}
                       #_{:method "stickers_installed"
                          :params [(ethereum/chain-id db)]
                          :on-success #(re-frame/dispatch [:stickers/owned-sticker-packs-success %])}]}

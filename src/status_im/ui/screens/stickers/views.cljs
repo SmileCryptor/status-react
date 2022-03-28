@@ -5,7 +5,6 @@
             [status-im.ui.components.icons.icons :as icons]
             [status-im.ui.components.react :as react]
             [status-im.ui.screens.stickers.styles :as styles]
-            [status-im.utils.contenthash :as contenthash]
             [status-im.utils.money :as money])
   (:require-macros [status-im.utils.views :refer [defview letsubs]]))
 
@@ -20,16 +19,17 @@
 (defview price-badge [price id owned? pending]
   (letsubs [chain   [:ethereum/chain-keyword]
             balance [:balance-default]]
-    (let [snt             (money/to-number (if (= :mainnet chain) (:SNT balance) (:STT balance)))
-          not-enough-snt? (> price snt)
-          no-snt?         (or (nil? snt) (zero? snt))]
+    (let [snt             (if (= :mainnet chain) (:SNT balance) (:STT balance))
+          price           (money/bignumber price)
+          not-enough-snt? (or (nil? snt) (money/equal-to snt 0) (money/greater-than price snt))
+          free            (money/equal-to price 0)]
       [react/touchable-highlight {:on-press #(cond pending nil
-                                                   (or owned? (zero? price))
+                                                   (or owned? free)
                                                    (re-frame/dispatch [:stickers/install-pack id])
-                                                   (or no-snt? not-enough-snt?) nil
+                                                   not-enough-snt? nil
                                                    :else (re-frame/dispatch [:stickers/buy-pack id price]))}
-       [react/view (styles/price-badge (and (not (or owned? (zero? price))) (or no-snt? not-enough-snt?)))
-        (when (and (not (zero? price)) (not owned?))
+       [react/view (styles/price-badge (and (not (or owned? free)) not-enough-snt?))
+        (when (and (not free) (not owned?))
           [icons/tiny-icon :tiny-icons/tiny-snt {:color colors/white-persist :container-style {:margin-right 6}}])
         (if pending
           [react/activity-indicator {:animating true
@@ -37,7 +37,7 @@
           [react/text {:style {:color colors/white-persist}
                        :accessibility-label :sticker-pack-price}
            (cond owned? (i18n/label :t/install)
-                 (zero? price) (i18n/label :t/free)
+                 free (i18n/label :t/free)
                  :else (str (money/wei-> :eth price)))])]])))
 
 (defn pack-badge [{:keys [name author price thumbnail preview id installed owned pending]}]
