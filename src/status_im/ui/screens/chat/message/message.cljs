@@ -604,7 +604,7 @@
                 [message.audio/message-content message] [message-status message]]]]]
             reaction-picker])))
 
-(defn contact-request-status-label [message]
+(defn contact-request-status-label []
   [react/view {:style {:flex-direction :row}}
    [quo/text {:style  {:margin-right 5.27}
               :weight :medium
@@ -622,6 +622,7 @@
                        :border-width 1
                        :border-color colors/gray-lighter
                        :align-items :center
+                       :padding-bottom 10
                        :margin-vertical 4
                        :align-self (if outgoing :flex-end :flex-start)
                        :margin-right (if outgoing 8 0)
@@ -632,18 +633,18 @@
    [quo/text {:style {:margin-top 6}
               :weight :bold
               :size   :large}
-    "Contact request"]
-   [quo/text {:style {:margin-top 2
-                      :margin-bottom 14}}
-    "👋 hey friend!"]
+    (i18n/label :t/contact-request)]
+   [react/view {:style {:padding-horizontal 16}}
+    [quo/text {:style {:margin-top 2
+                       :margin-bottom 14}}
+     (get-in message [:content :text])]]
    [react/view {:style {:width 136
-                        :height 44
                         :border-radius 8
                         :border-width 1
                         :border-color colors/gray-lighter
                         :padding-vertical 10
                         :padding-horizontal 16}}
-    [contact-request-status-label message]]])
+    [contact-request-status-label]]])
 
 (defmethod ->message :default [message]
   [message-content-wrapper message

@@ -81,6 +81,7 @@
    "wakuext_loadFilters" {}
    "wakuext_loadFilter" {}
    "wakuext_removeFilters" {}
+   "wakuext_sendContactRequest" {}
    "wakuext_sendContactUpdate" {}
    "wakuext_sendContactUpdates" {}
    "wakuext_chatsPreview" {}

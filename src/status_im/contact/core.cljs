@@ -28,13 +28,6 @@
     (= public-key (:public-key multiaccount))
     (assoc :name (:name multiaccount))))
 
-(defn- own-info
-  [db]
-  (let [{:keys [name preferred-name identicon address]} (:multiaccount db)]
-    {:name          (or preferred-name name)
-     :profile-image identicon
-     :address       address}))
-
 (fx/defn ensure-contacts
   [{:keys [db]} contacts chats]
   (let [events
@@ -65,14 +58,6 @@
                            contacts))}
      (when (> (count events) 1)
        {:dispatch-n events}))))
-
-(fx/defn send-contact-request
-  {:events [::send-contact-request]}
-  [{:keys [db] :as cofx} public-key]
-  (let [{:keys [name profile-image]} (own-info db)]
-    {::json-rpc/call [{:method (json-rpc/call-ext-method "sendContactUpdate")
-                       :params [public-key name profile-image]
-                       :on-success #(log/debug "contact request sent" public-key)}]}))
 
 (fx/defn add-contact
   "Add a contact and set pending to false"
