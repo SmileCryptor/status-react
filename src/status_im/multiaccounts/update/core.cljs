@@ -49,6 +49,7 @@
 
 (fx/defn set-many-js
   [cofx settings-js]
+  (js/console.log "1234---------------------------")
   (apply fx/merge
          cofx
          (map
