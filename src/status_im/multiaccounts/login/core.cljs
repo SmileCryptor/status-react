@@ -440,7 +440,6 @@
               (initialize-transactions-management-enabled)
               (check-network-version network-id)
               (contact/initialize-contacts)
-              (stickers/init-stickers-packs)
               (initialize-browser)
               (mobile-network/on-network-status-change)
               (get-group-chat-invitations)

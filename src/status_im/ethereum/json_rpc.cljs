@@ -243,7 +243,14 @@
    "appmetrics_saveAppMetrics" {}
    "appmetrics_getAppMetrics" {}
    "stickers_market" {}
-   "stickers_installed" {}})
+   "stickers_installed" {}
+   "stickers_install" {}
+   "stickers_addRecent" {}
+   "stickers_recent" {}
+   "stickers_buyPrepareTx" {}
+   "stickers_processPending" {}
+   "stickers_AddPending" {}
+   "stickers_pending" {}})
 
 (defn on-error-retry
   [call-method {:keys [method number-of-retries delay on-error] :as arg}]

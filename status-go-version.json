@@ -3,7 +3,7 @@
     "_comment": "Instead use: scripts/update-status-go.sh <rev>",
     "owner": "status-im",
     "repo": "status-go",
-    "version": "v0.97.4",
-    "commit-sha1": "724689086cdd3edef71a31c17e8888b1933c9ea5",
-    "src-sha256": "091fc4ql9mp99ljw3l644bvkmwrfj2sq2mdhkwz6bn3z2maxgalk"
+    "version": "feat/ipfs-rate-limiter",
+    "commit-sha1": "a4424ecb2092c9dce969e6df5243f9f7e11935b3",
+    "src-sha256": "1fsk7nz9hp3f141gap1gqm3x3ymjixcszjiq99gihdp26myw70cc"
 }
